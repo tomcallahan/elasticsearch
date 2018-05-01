@@ -43,7 +43,7 @@ public class ShortcuttingPermissionsCollections extends PermissionCollection {
                 x++;
                 if (pc.implies(permission)) {
                     if (r.nextInt(50) == 0) {
-                        System.out.println("checks: "+x);
+                        System.out.println("checks: "+x+ " " + permission.getName());
                     }
                     return true;
                 }
