@@ -78,12 +78,6 @@ final class ESPolicy extends Policy {
             if (BootstrapInfo.UNTRUSTED_CODEBASE.equals(location.getFile())) {
                 return untrusted.implies(domain, permission);
             }
-            // check for an additional plugin permission: plugin policy is
-            // only consulted for its codesources.
-            Policy plugin = plugins.get(location.getFile());
-            if (plugin != null && plugin.implies(domain, permission)) {
-                return true;
-            }
         }
 
         // Special handling for broken Hadoop code: "let me execute or my classes will not load"
@@ -100,7 +94,17 @@ final class ESPolicy extends Policy {
         }
 
         // otherwise defer to template + dynamic file permissions
-        return template.implies(domain, permission) || dynamic.implies(permission) || system.implies(domain, permission);
+        return template.implies(domain, permission) || dynamic.implies(permission) || system.implies(domain, permission) ||
+            pluginCodesourcesPermitted(location, domain, permission);
+    }
+    private boolean pluginCodesourcesPermitted(URL location, ProtectionDomain domain, Permission permission) {
+        // check for an additional plugin permission: plugin policy is
+        // only consulted for its codesources.
+        Policy plugin = plugins.get(location.getFile());
+        if (plugin != null && plugin.implies(domain, permission)) {
+            return true;
+        }
+        return false;
     }
 
     /**
