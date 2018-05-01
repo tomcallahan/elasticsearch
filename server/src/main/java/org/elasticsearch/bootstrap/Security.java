@@ -254,7 +254,7 @@ final class Security {
         addClasspathPermissions(policy);
         addFilePermissions(spc, environment);
         addBindPermissions(policy, environment.settings());
-        return policy;
+        return spc;
     }
 
     /** Adds access to classpath jars/classes for jar hell scan, etc */
