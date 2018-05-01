@@ -16,7 +16,6 @@ class DataAwareDelegatingPermissionsCollection extends PermissionCollection {
     private final Path[] dataPaths;
     private final PermissionCollection delegate;
     private final CopyOnWriteArrayList<PermissionCollection> shortcutPermissions = new CopyOnWriteArrayList<>();
-    Random r = new Random();
     private final AtomicLong counter = new AtomicLong(0);
     public DataAwareDelegatingPermissionsCollection(Path[] dataPaths, PermissionCollection delegate) {
         this.dataPaths = dataPaths;
@@ -33,7 +32,6 @@ class DataAwareDelegatingPermissionsCollection extends PermissionCollection {
             for (Path p : dataPaths) {
                 if (p.toString().equals(fp.getName()) || p.toString().equals(fp.getName().substring(0, fp.getName().length()-2))) {
                     shortcutPermissions.add(pc);
-                    System.out.println("ShortCut: "+fp.getName());
                 }
             }
         }
@@ -49,10 +47,6 @@ class DataAwareDelegatingPermissionsCollection extends PermissionCollection {
                     return true;
                 }
             }
-        }
-        if (r.nextInt(500) == 0) {
-            System.out.println("Caught: "+counter.get());
-            System.out.println("Not Caught: "+permission.getName());
         }
         return delegate.implies(permission);
     }
