@@ -52,6 +52,7 @@ public class ShortcuttingPermissionsCollections extends PermissionCollection {
             for (PermissionCollectionContainer pcc : perms) {
                 x++;
                 if (pcc.perm.implies(permission)) {
+                    pcc.accesses.incrementAndGet();
                     if (r.nextInt(50) == 0) {
                         System.out.println("checks: "+x+ " " + permission.getName());
                     }
