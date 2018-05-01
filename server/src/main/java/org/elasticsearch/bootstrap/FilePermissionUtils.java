@@ -25,6 +25,7 @@ import java.io.FilePermission;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.security.PermissionCollection;
 import java.security.Permissions;
 
 public class FilePermissionUtils {
@@ -41,7 +42,7 @@ public class FilePermissionUtils {
      * @param permissions set of file permissions to grant to the path
      */
     @SuppressForbidden(reason = "only place where creating Java-9 compatible FilePermission objects is possible")
-    public static void addSingleFilePath(Permissions policy, Path path, String permissions) throws IOException {
+    public static void addSingleFilePath(PermissionCollection policy, Path path, String permissions) throws IOException {
         policy.add(new FilePermission(path.toString(), permissions));
         if (VERSION_IS_AT_LEAST_JAVA_9 && Files.exists(path)) {
             // Java 9 FilePermission model requires this due to the removal of pathname canonicalization,
@@ -62,7 +63,8 @@ public class FilePermissionUtils {
      * @param permissions       set of file permissions to grant to the path
      */
     @SuppressForbidden(reason = "only place where creating Java-9 compatible FilePermission objects is possible")
-    public static void addDirectoryPath(Permissions policy, String configurationName, Path path, String permissions) throws IOException {
+    public static void addDirectoryPath(PermissionCollection policy, String configurationName, Path path, String permissions) throws
+        IOException {
         // paths may not exist yet, this also checks accessibility
         try {
             Security.ensureDirectoryExists(path);

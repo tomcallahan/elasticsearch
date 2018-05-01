@@ -22,7 +22,6 @@ package org.elasticsearch.bootstrap;
 import org.elasticsearch.cli.Command;
 import org.elasticsearch.common.SuppressForbidden;
 import org.elasticsearch.common.io.PathUtils;
-import org.elasticsearch.common.network.NetworkModule;
 import org.elasticsearch.common.settings.Settings;
 import org.elasticsearch.env.Environment;
 import org.elasticsearch.http.HttpTransportSettings;
@@ -42,6 +41,7 @@ import java.nio.file.Files;
 import java.nio.file.NotDirectoryException;
 import java.nio.file.Path;
 import java.security.NoSuchAlgorithmException;
+import java.security.PermissionCollection;
 import java.security.Permissions;
 import java.security.Policy;
 import java.security.URIParameter;
@@ -247,17 +247,18 @@ final class Security {
     }
 
     /** returns dynamic Permissions to configured paths and bind ports */
-    static Permissions createPermissions(Environment environment) throws IOException {
-        Permissions policy = new Permissions();
-        addClasspathPermissions(policy);
-        addFilePermissions(policy, environment);
-        addBindPermissions(policy, environment.settings());
-        return policy;
+    static PermissionCollection createPermissions(Environment environment) throws IOException {
+        DataAwareDelegatingPermissionsCollection permissions = new DataAwareDelegatingPermissionsCollection(environment.dataFiles(),
+            new Permissions());
+        addClasspathPermissions(permissions);
+        addFilePermissions(permissions, environment);
+        addBindPermissions(permissions, environment.settings());
+        return permissions;
     }
 
     /** Adds access to classpath jars/classes for jar hell scan, etc */
     @SuppressForbidden(reason = "accesses fully qualified URLs to configure security")
-    static void addClasspathPermissions(Permissions policy) throws IOException {
+    static void addClasspathPermissions(PermissionCollection policy) throws IOException {
         // add permissions to everything in classpath
         // really it should be covered by lib/, but there could be e.g. agents or similar configured)
         for (URL url : JarHell.parseClassPath()) {
@@ -279,7 +280,7 @@ final class Security {
     /**
      * Adds access to all configurable paths.
      */
-    static void addFilePermissions(Permissions policy, Environment environment) throws IOException {
+    static void addFilePermissions(PermissionCollection policy, Environment environment) throws IOException {
         // read-only dirs
         addDirectoryPath(policy, Environment.PATH_HOME_SETTING.getKey(), environment.binFile(), "read,readlink");
         addDirectoryPath(policy, Environment.PATH_HOME_SETTING.getKey(), environment.libFile(), "read,readlink");
@@ -325,7 +326,7 @@ final class Security {
      * @param policy the {@link Permissions} instance to apply the dynamic {@link SocketPermission}s to.
      * @param settings the {@link Settings} instance to read the HTTP and transport settings from
      */
-    private static void addBindPermissions(Permissions policy, Settings settings) {
+    private static void addBindPermissions(PermissionCollection policy, Settings settings) {
         addSocketPermissionForHttp(policy, settings);
         addSocketPermissionForTransportProfiles(policy, settings);
     }
@@ -336,7 +337,7 @@ final class Security {
      * @param policy the {@link Permissions} instance to apply the dynamic {@link SocketPermission}s to.
      * @param settings the {@link Settings} instance to read the HTTP settings from
      */
-    private static void addSocketPermissionForHttp(final Permissions policy, final Settings settings) {
+    private static void addSocketPermissionForHttp(final PermissionCollection policy, final Settings settings) {
         // http is simple
         final String httpRange = HttpTransportSettings.SETTING_HTTP_PORT.get(settings).getPortRangeString();
         addSocketPermissionForPortRange(policy, httpRange);
@@ -349,7 +350,7 @@ final class Security {
      * @param policy          the {@link Permissions} instance to apply the dynamic {@link SocketPermission}s to
      * @param settings        the {@link Settings} instance to read the transport settings from
      */
-    private static void addSocketPermissionForTransportProfiles(final Permissions policy, final Settings settings) {
+    private static void addSocketPermissionForTransportProfiles(final PermissionCollection policy, final Settings settings) {
         // transport is way over-engineered
         Set<TcpTransport.ProfileSettings> profiles = TcpTransport.getProfileSettings(settings);
         Set<String> uniquePortRanges = new HashSet<>();
@@ -368,7 +369,7 @@ final class Security {
      * @param policy          the {@link Permissions} instance to apply the dynamic {@link SocketPermission}s to
      * @param settings        the {@link Settings} instance to read the transport settings from
      */
-    private static void addSocketPermissionForTransport(final Permissions policy, final Settings settings) {
+    private static void addSocketPermissionForTransport(final PermissionCollection policy, final Settings settings) {
         final String transportRange = TcpTransport.PORT.get(settings);
         addSocketPermissionForPortRange(policy, transportRange);
     }
@@ -379,7 +380,7 @@ final class Security {
      * @param policy the {@link Permissions} instance to apply the dynamic {@link SocketPermission} to.
      * @param portRange the port range
      */
-    private static void addSocketPermissionForPortRange(final Permissions policy, final String portRange) {
+    private static void addSocketPermissionForPortRange(final PermissionCollection policy, final String portRange) {
         // listen is always called with 'localhost' but use wildcard to be sure, no name service is consulted.
         // see SocketPermission implies() code
         policy.add(new SocketPermission("*:" + portRange, "listen,resolve"));
