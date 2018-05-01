@@ -28,6 +28,7 @@ class DataAwareDelegatingPermissionsCollection extends PermissionCollection {
             FilePermission fp = (FilePermission) permission;
             System.out.println("Adding FilePermission: "+permission.getName());
             PermissionCollection pc = fp.newPermissionCollection();
+            pc.add(fp);
             System.out.println("Data Paths: "+ Arrays.toString(dataPaths));
             for (Path p : dataPaths) {
                 if (p.toString().equals(fp.getName()) || p.toString().equals(fp.getName().substring(0, fp.getName().length()-2))) {
@@ -49,7 +50,7 @@ class DataAwareDelegatingPermissionsCollection extends PermissionCollection {
                 }
             }
         }
-        if (r.nextInt(50) == 0) {
+        if (r.nextInt(500) == 0) {
             System.out.println("Caught: "+counter.get());
             System.out.println("Not Caught: "+permission.getName());
         }
