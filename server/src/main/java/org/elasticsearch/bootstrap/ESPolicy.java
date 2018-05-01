@@ -94,8 +94,11 @@ final class ESPolicy extends Policy {
         }
 
         // otherwise defer to template + dynamic file permissions
-        return template.implies(domain, permission) || dynamic.implies(permission) || system.implies(domain, permission) ||
-            pluginCodesourcesPermitted(location, domain, permission);
+        boolean templateB = template.implies(domain, permission);
+        boolean dynamicB = dynamic.implies(permission);
+        boolean systemB = system.implies(domain, permission);
+        boolean plugin = pluginCodesourcesPermitted(location, domain, permission);
+        return templateB || dynamicB || systemB || plugin;
     }
     private boolean pluginCodesourcesPermitted(URL location, ProtectionDomain domain, Permission permission) {
         // check for an additional plugin permission: plugin policy is
