@@ -115,7 +115,7 @@ public class BootstrapForTesting {
                         Booleans.parseBoolean(System.getProperty("tests.coverage", "false"));
                 if (testsCoverage) {
                     Path coverageDir = PathUtils.get(System.getProperty("tests.coverage.dir"));
-                    FilePermissionUtils.addSingleFilePath(perms, coverageDir.resolve("jacoco.exec"), "read,write");
+                    FilePermissionUtils.    addSingleFilePath(perms, coverageDir.resolve("jacoco.exec"), "read,write");
                     // in case we get fancy and use the -integration goals later:
                     FilePermissionUtils.addSingleFilePath(perms, coverageDir.resolve("jacoco-it.exec"), "read,write");
                 }

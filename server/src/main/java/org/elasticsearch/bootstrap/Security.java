@@ -42,6 +42,7 @@ import java.nio.file.Files;
 import java.nio.file.NotDirectoryException;
 import java.nio.file.Path;
 import java.security.NoSuchAlgorithmException;
+import java.security.PermissionCollection;
 import java.security.Permissions;
 import java.security.Policy;
 import java.security.URIParameter;
@@ -247,10 +248,11 @@ final class Security {
     }
 
     /** returns dynamic Permissions to configured paths and bind ports */
-    static Permissions createPermissions(Environment environment) throws IOException {
+    static PermissionCollection createPermissions(Environment environment) throws IOException {
         Permissions policy = new Permissions();
+        ShortcuttingPermissionsCollections spc = new ShortcuttingPermissionsCollections(policy);
         addClasspathPermissions(policy);
-        addFilePermissions(policy, environment);
+        addFilePermissions(spc, environment);
         addBindPermissions(policy, environment.settings());
         return policy;
     }
@@ -279,7 +281,7 @@ final class Security {
     /**
      * Adds access to all configurable paths.
      */
-    static void addFilePermissions(Permissions policy, Environment environment) throws IOException {
+    static void addFilePermissions(PermissionCollection policy, Environment environment) throws IOException {
         // read-only dirs
         addDirectoryPath(policy, Environment.PATH_HOME_SETTING.getKey(), environment.binFile(), "read,readlink");
         addDirectoryPath(policy, Environment.PATH_HOME_SETTING.getKey(), environment.libFile(), "read,readlink");
