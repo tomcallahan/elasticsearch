@@ -104,8 +104,9 @@ public class BootstrapForTesting {
                 // initialize paths the same exact way as bootstrap
                 Permissions perms = new Permissions();
                 Security.addClasspathPermissions(perms);
+                ShortcuttingPermissionsCollections spc = new ShortcuttingPermissionsCollections(perms);
                 // java.io.tmpdir
-                FilePermissionUtils.addDirectoryPath(perms, "java.io.tmpdir", javaTmpDir, "read,readlink,write,delete");
+                FilePermissionUtils.addDirectoryPath(spc, "java.io.tmpdir", javaTmpDir, "read,readlink,write,delete");
                 // custom test config file
                 if (Strings.hasLength(System.getProperty("tests.config"))) {
                     FilePermissionUtils.addSingleFilePath(perms, PathUtils.get(System.getProperty("tests.config")), "read,readlink");
@@ -143,7 +144,7 @@ public class BootstrapForTesting {
                     addClassCodebase(codebases, "elasticsearch-rest-client", "org.elasticsearch.client.RestClient");
                 }
                 final Policy testFramework = Security.readPolicy(Bootstrap.class.getResource("test-framework.policy"), codebases);
-                final Policy esPolicy = new ESPolicy(codebases, perms, getPluginPermissions(), true);
+                final Policy esPolicy = new ESPolicy(codebases, spc, getPluginPermissions(), true);
                 Policy.setPolicy(new Policy() {
                     @Override
                     public boolean implies(ProtectionDomain domain, Permission permission) {
