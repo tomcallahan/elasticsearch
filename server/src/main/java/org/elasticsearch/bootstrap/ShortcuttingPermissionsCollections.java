@@ -7,7 +7,6 @@ import java.security.Permission;
 import java.security.PermissionCollection;
 import java.util.Enumeration;
 import java.util.List;
-import java.util.Random;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
@@ -20,7 +19,6 @@ public class ShortcuttingPermissionsCollections extends PermissionCollection {
     private final PermissionCollection delegate;
     int permNo = 0;
     int delegateNo = 0;
-    Random r = new Random();
     public ShortcuttingPermissionsCollections(PermissionCollection delegate) {
         this.delegate = delegate;
     }
@@ -37,8 +35,6 @@ public class ShortcuttingPermissionsCollections extends PermissionCollection {
         delegate.add(permission);
         delegateNo++;
 
-        System.out.println("shortcut perms: "+permNo);
-        System.out.println("delegate num: "+delegateNo);
     }
 
     @Override
@@ -53,9 +49,6 @@ public class ShortcuttingPermissionsCollections extends PermissionCollection {
                 x++;
                 if (pcc.perm.implies(permission)) {
                     pcc.accesses.incrementAndGet();
-                    if (r.nextInt(50) == 0) {
-                        System.out.println("checks: "+x+ " " + permission.getName());
-                    }
                     return true;
                 }
             }
@@ -66,7 +59,6 @@ public class ShortcuttingPermissionsCollections extends PermissionCollection {
         List<PermissionCollectionContainer> list = perms.stream()
             .sorted((a, b) -> b.accesses.get() - a.accesses.get()).collect(Collectors.toList());
         perms = new CopyOnWriteArrayList<>(list);
-        System.out.println("re-ordered");
     }
 
     @Override
