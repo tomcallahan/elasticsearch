@@ -26,8 +26,9 @@ class DataAwareDelegatingPermissionsCollection extends PermissionCollection {
             PermissionCollection pc = fp.newPermissionCollection();
             System.out.println("Data Paths: "+ Arrays.toString(dataPaths));
             for (Path p : dataPaths) {
-                if (p.toString().startsWith(fp.getName())) {
+                if (p.toString().equals(fp.getName()) || p.toString().equals(fp.getName()+"/-")) {
                     shortcutPermissions.add(pc);
+                    System.out.println("ShortCut: "+fp.getName());
                 }
             }
         }
