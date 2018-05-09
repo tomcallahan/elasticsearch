@@ -1,7 +1,8 @@
 {
   "pull_request": "29609",
   "headline": "Removed bulk name fallback for write thread pool name",
-  "intended_versions": ["7.0.0"],
+  "intended_versions": ["7.0"],
   "type": "removal",
-  "breaking": true
+  "breaking": true,
+  "notability": "major"
 }

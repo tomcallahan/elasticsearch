@@ -1,7 +1,8 @@
 {
   "pull_request": "29230",
   "headline": "Java High-level Rest Client: Hosts just marked as dead will not be immediately retried",
-  "intended_versions": ["6.2.4", "6.3.0", "7.0.0"],
+  "intended_versions": ["6.2", "6.3", "7.0"],
   "type": "bug",
-  "breaking": false
+  "breaking": false,
+  "notability": "minor"
 }
