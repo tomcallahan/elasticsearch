@@ -1,0 +1,7 @@
+{
+  "pull_request": "30140",
+  "headline": "Fail gracefully and promptly when snapshot repository is corrupted",
+  "intended_versions": ["7.0.0", "6.4.0"],
+  "type": "bugfix",
+  "breaking": false
+}

@@ -1,0 +1,7 @@
+{
+  "pull_request": "29229",
+  "headline": "Add Get Settings API to Java high-level rest client",
+  "intended_versions": ["7.0.0", "6.4.0"],
+  "type": "enhancement",
+  "breaking": false
+}
